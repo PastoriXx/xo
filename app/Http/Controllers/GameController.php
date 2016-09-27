@@ -11,7 +11,7 @@ class GameController extends Controller
 {
     public function index()
     {
-		$gamingMap = Game::createGamingMap(5);
+		$gamingMap = Game::createGamingMap();
 
     	$gamingMap = Game::updateWeightsOfElements($gamingMap);
 
