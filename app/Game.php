@@ -19,11 +19,12 @@ class Game extends Model
     	for ($i = 0; $i < $sizeMap; $i++) { 
 	    	for ($j = 0; $j < $sizeMap; $j++) { 
 	    		$gamingMap[$i][$j] = array(
-	    			'type' => rand(-1,1), 	// Type (default -1)
+	    			'type' => rand(0,1), 	// Type (default -1)
 	    			'h'    => 0, 			// Horizontal line (default 0)
 	    			'v'    => 0,			// Vertical line (default 0)
 	    			'di'   => 0,			// Increasing diagonal (default 0)
 	    			'dd'   => 0,			// Decreasing diagonal (default 0)
+	    			'win'  => 0,			// 
 				);  
 			}	
     	}
@@ -68,63 +69,75 @@ class Game extends Model
 
 		// Horizontal line
 		if ($direction == 'h' || ($direction == null && $gamingMap[$i][$j]['h'] == null)) {
-	    	if ($j > 0) {
-		    	$gamingMap[$i][$j]['h'] = $gamingMap[$i][$j - 1]['type'] == $gamingMap[$i][$j]['type'] ? $gamingMap[$i][$j - 1]['h'] + 1 : 1;
+	    	$gamingMap[$i][$j]['h'] = $checkedCells['h']['down'] ? $gamingMap[$i][$j - 1]['h'] + 1 : 1;
+
+	    	if (!$checkedCells['h']['up']) {
+	    		if ($gamingMap[$i][$j]['h'] == 5) {
+					$gamingMap[$i][$j]['win'] = 'h';
+					return $gamingMap;
+	    		}
 	    	} else {
-	    		$gamingMap[$i][$j]['h']++;
+				$gamingMap = self::__findLine($gamingMap, $i, $j + 1, 'h');
+				if($gamingMap[$i][$j + 1]['win'] == 'h') {
+					$gamingMap[$i][$j]['win'] = 'h';
+					return $gamingMap;
+		    	}
 	    	}
-
-	    	if($gamingMap[$i][$j]['h'] == 5) {
-			
-	    	}
-
-			$gamingMap = !$checkedCells['h'] ? $gamingMap : self::__findLine($gamingMap, $i, $j + 1, 'h');			
 		}
 
 		// Vertical line
-		if ($direction == 'v' || ($direction == null && $gamingMap[$i][$j]['v'] == null)) {
-	    	if ($i > 0) {
-		    	$gamingMap[$i][$j]['v'] = $gamingMap[$i - 1][$j]['type'] == $gamingMap[$i][$j]['type'] ? $gamingMap[$i - 1][$j]['v'] + 1 : 1;
+		if ($direction == 'v' || ($direction == null && $gamingMap[$i][$j]['v'] == null)) {    	
+	    	$gamingMap[$i][$j]['v'] = $checkedCells['v']['down'] ? $gamingMap[$i - 1][$j]['v'] + 1 : 1;
+
+	    	if (!$checkedCells['v']['up']) {
+	    		if ($gamingMap[$i][$j]['v'] == 5) {
+					$gamingMap[$i][$j]['win'] = 'v';
+					return $gamingMap;
+	    		}
 	    	} else {
-	    		$gamingMap[$i][$j]['v']++;
+				$gamingMap = self::__findLine($gamingMap, $i + 1, $j, 'v');
+				if($gamingMap[$i + 1][$j]['win'] == 'v') {
+					$gamingMap[$i][$j]['win'] = 'v';
+					return $gamingMap;
+		    	}
 	    	}
-
-	    	if($gamingMap[$i][$j]['v'] == 5) {
-			
-	    	}
-
-			$gamingMap = !$checkedCells['v'] ? $gamingMap : self::__findLine($gamingMap, $i + 1, $j, 'v');			
 		}
 
 		// Increasing diagonal
 		if ($direction == 'di' || ($direction == null && $gamingMap[$i][$j]['di'] == null)) {
-	    	if ($i > 0 && $j > 0) {
-		    	$gamingMap[$i][$j]['di'] = $gamingMap[$i - 1][$j - 1]['type'] == $gamingMap[$i][$j]['type'] ? $gamingMap[$i - 1][$j - 1]['di'] + 1 : 1;
+	    	$gamingMap[$i][$j]['di'] = $checkedCells['di']['down'] ? $gamingMap[$i - 1][$j - 1]['di'] + 1 : 1;
+
+	    	if (!$checkedCells['di']['up']) {
+	    		if ($gamingMap[$i][$j]['di'] == 5) {
+					$gamingMap[$i][$j]['win'] = 'di';
+					return $gamingMap;
+	    		}
 	    	} else {
-	    		$gamingMap[$i][$j]['di']++;
+				$gamingMap = self::__findLine($gamingMap, $i + 1, $j + 1, 'di');
+				if($gamingMap[$i + 1][$j + 1]['win'] == 'di') {
+					$gamingMap[$i][$j]['win'] = 'di';
+					return $gamingMap;
+		    	}
 	    	}
-
-	    	if($gamingMap[$i][$j]['di'] == 5) {
-			
-	    	}
-
-			$gamingMap = !$checkedCells['di'] ? $gamingMap : self::__findLine($gamingMap, $i + 1, $j + 1, 'di');			
 		}
 
 		// Decreasing diagonal
 		if ($direction == 'dd' || ($direction == null && $gamingMap[$i][$j]['dd'] == null)) {
-	    	if ($i > 0 && count($gamingMap[$i]) - 1 > $j) {
-		    	$gamingMap[$i][$j]['dd'] = $gamingMap[$i - 1][$j + 1]['type'] == $gamingMap[$i][$j]['type'] ? $gamingMap[$i - 1][$j + 1]['dd'] + 1 : 1;
-			
+	    	$gamingMap[$i][$j]['dd'] = $checkedCells['dd']['down'] ? $gamingMap[$i - 1][$j + 1]['dd'] + 1 : 1;
+
+			if (!$checkedCells['dd']['up']) {
+	    		if ($gamingMap[$i][$j]['dd'] == 5) {
+					$gamingMap[$i][$j]['win'] = 'dd';
+					return $gamingMap;
+	    		}
 	    	} else {
-	    		$gamingMap[$i][$j]['dd']++;
+				$gamingMap = self::__findLine($gamingMap, $i + 1, $j - 1, 'dd');
+				if($gamingMap[$i + 1][$j - 1]['win'] == 'dd') {
+					$gamingMap[$i][$j]['win'] = 'dd';
+					return $gamingMap;
+		    	}
 	    	}
 
-	    	if($gamingMap[$i][$j]['dd'] == 5) {
-			
-	    	}
-
-			$gamingMap = !$checkedCells['dd'] ? $gamingMap : self::__findLine($gamingMap, $i + 1, $j - 1, 'dd');
 		}
 
     	return $gamingMap;
@@ -142,10 +155,17 @@ class Game extends Model
     	$checkedCells = array();
     	$type = $gamingMap[$i][$j]['type'];
 
-    	$checkedCells['h']  = (count($gamingMap[$i]) - 1 > $j && $gamingMap[$i][$j + 1]['type'] == $type) ? 1 : 0;
-    	$checkedCells['v']  = (count($gamingMap) - 1 > $i && $gamingMap[$i + 1][$j]['type'] == $type) ? 1 : 0;
-    	$checkedCells['di'] = (count($gamingMap[$i]) - 2 > $j && count($gamingMap) - 2 > $i && $gamingMap[$i + 1][$j + 1]['type'] == $type) ? 1 : 0;
-    	$checkedCells['dd'] = (count($gamingMap) - 2 > $i && $j > 0 && $gamingMap[$i + 1][$j - 1]['type'] == $type) ? 1 : 0;
+    	$checkedCells['h']['up']  	= (count($gamingMap[$i]) - 2 > $j && $gamingMap[$i][$j + 1]['type'] == $type) ? 1 : 0;
+    	$checkedCells['h']['down']  = ($j > 0 && $gamingMap[$i][$j - 1]['type'] == $type) ? 1 : 0;
+
+    	$checkedCells['v']['up']  	= (count($gamingMap) - 2 > $i && $gamingMap[$i + 1][$j]['type'] == $type) ? 1 : 0;
+    	$checkedCells['v']['down']  = ($i > 0 && $gamingMap[$i - 1][$j]['type'] == $type) ? 1 : 0;
+
+    	$checkedCells['di']['up']   = (count($gamingMap[$i]) - 2 > $j && count($gamingMap) - 2 > $i && $gamingMap[$i + 1][$j + 1]['type'] == $type) ? 1 : 0;
+    	$checkedCells['di']['down'] = ($j > 0 && $i > 0 && $gamingMap[$i - 1][$j - 1]['type'] == $type) ? 1 : 0;
+
+    	$checkedCells['dd']['up']	= (count($gamingMap) - 2 > $i && $j > 0 && $gamingMap[$i + 1][$j - 1]['type'] == $type) ? 1 : 0;
+    	$checkedCells['dd']['down'] = (count($gamingMap[$i]) - 2 > $j && $i > 0 && $gamingMap[$i - 1][$j + 1]['type'] == $type) ? 1 : 0;
 
     	return $checkedCells;
     }
