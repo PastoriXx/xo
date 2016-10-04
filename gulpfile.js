@@ -15,5 +15,19 @@ require('laravel-elixir-vue');
 
 elixir(mix => {
     mix.sass('app.scss')
-       .webpack('app.js');
+    
+     mix.scripts([
+     	'gamingMap.js',
+
+    ], null, 'public/js');
+
+	mix.styles([
+        'app.css',
+        'style.css',
+    ], null, 'public/css');
+
+    mix.version([
+        'public/css/all.css',
+        'public/js/all.js'
+    ]);
 });

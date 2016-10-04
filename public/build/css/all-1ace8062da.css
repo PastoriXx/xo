@@ -5767,3 +5767,22 @@ button.close {
     display: none !important; } }
 
 /*# sourceMappingURL=app.css.map */
+
+*{
+    padding:0;
+    margin:0;
+}
+body{
+    padding:20px;
+    background:#F5F5DC;
+}
+
+.gameboard{
+    padding-left: 0;
+    padding-right: 0;
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    width: 609px;
+}
+/*# sourceMappingURL=all.css.map */
